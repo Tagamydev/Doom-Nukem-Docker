@@ -6,7 +6,7 @@
 #    By: samusanc <samusanc@student.42madrid>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/24 19:28:25 by samusanc          #+#    #+#              #
-#    Updated: 2024/08/02 19:00:28 by samusanc         ###   ########.fr        #
+#    Updated: 2024/08/02 21:57:12 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ COMPOSE_FILE =
 INVALID_FILE = -no-valid
 
 ifeq ($(OS),Windows_NT)
-	COMPSOE_FILE += -windows
+	COMPOSE_FILE += -windows
 	
 else
 
@@ -34,7 +34,9 @@ ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
 	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
+	xhost +
 	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
+	docker image prune -f
 endif
 
 up:
