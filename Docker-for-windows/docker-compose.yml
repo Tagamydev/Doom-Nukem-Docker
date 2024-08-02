@@ -1,0 +1,5 @@
+services:
+  cub3d:
+    build: ./
+    image: cub3d
+    container_name: cub3d
