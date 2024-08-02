@@ -6,48 +6,70 @@
 #    By: samusanc <samusanc@student.42madrid>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/24 19:28:25 by samusanc          #+#    #+#              #
-#    Updated: 2024/07/28 19:59:57 by samusanc         ###   ########.fr        #
+#    Updated: 2024/08/02 19:00:28 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-all:
+COMPOSE_FILE =
+INVALID_FILE = -no-valid
+
 ifeq ($(OS),Windows_NT)
-	echo "Building Doom-Nukem for Windows..."
-	make -sC ./Docker-for-windows/ all
+	COMPSOE_FILE += -windows
+	
 else
 
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
-		echo "Building Doom-Nukem for Linux..."
-		
+		COMPOSE_FILE += -linux
 	else
-		echo "Sorry, your system is not supported."
+		COMPOSE_FILE += -no-valid
 	endif
 	
 endif
 
-clean:
-ifeq ($(OS),Windows_NT)
-	echo "cleaning containers Windows..."
+all: build up
+
+build:
+ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
+	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
-
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		echo "cleaning containers Linux..."
-	endif
-	
+	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
+	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
 endif
 
-fclean: clean
-ifeq ($(OS),Windows_NT)
-	echo "cleaning everithing Windows..."
+up:
+ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
+	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
-
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		echo "cleaning everithing Linux..."
-	endif
-	
+	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
+	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml up --build
 endif
 
-.PHONY: all fclean clean
+down:
+ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
+	@echo "Srry building not valid for this OS, try to be a normal human being..."
+else
+	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml down
+endif
+
+stop:
+	if [ -n "$$(docker ps -aq)" ]; then \
+		docker stop $$(docker ps -aq); \
+	fi
+
+delvol:
+	if [ -n "$$(docker volume ls -qf dangling=true)" ]; then \
+		docker volume rm $$(docker volume ls -qf dangling=true); \
+	fi
+
+re: fclean all
+
+fclean: down clean delvol
+	docker system prune -a -f
+
+clean: stop
+	if [ -n "$$(docker ps -aq)" ]; then \
+		docker rm $$(docker ps -aq); \
+	fi
+
+.PHONY: all fclean clean up down stop delvol

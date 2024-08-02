@@ -1,5 +1,0 @@
-services:
-  cub3d:
-    build: ./requirements/
-    image: cub3d
-    container_name: cub3d

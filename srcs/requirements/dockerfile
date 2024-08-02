@@ -6,3 +6,9 @@ RUN apt-get install -y \
     git \
     x11-common xserver-xorg \
     build-essential
+
+COPY ./cheat.sh /home/
+
+RUN chmod +x /home/cheat.sh
+
+ENTRYPOINT ["/home/cheat.sh"]

@@ -1,0 +1,9 @@
+services:
+ cub3d:
+  build: ./requirements/
+  image: cub3d
+  container_name: cub3d
+  volumes:
+   - type: bind
+     source: /tmp/.X11-unix
+     target: /tmp/.X11-unix
