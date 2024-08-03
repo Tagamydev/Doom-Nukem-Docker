@@ -10,6 +10,8 @@
 #                                                                              #
 # **************************************************************************** #
 
+DOCKER_PS := $(shell docker ps -aq)
+DOCKER_VL := $(shell docker volume ls -qf dangling=true)
 COMPOSE_FILE =
 INVALID_FILE = -no-valid
 
@@ -38,8 +40,10 @@ build:
 ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
+ifeq ($(COMPOSE_FILE),-linux)
 	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
 	xhost +
+endif
 	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
 	docker image prune -f
 endif
@@ -60,14 +64,14 @@ else
 endif
 
 stop:
-	if [ -n "$$(docker ps -aq)" ]; then \
-		docker stop $$(docker ps -aq); \
-	fi
+	-docker stop $(DOCKER_PS)
+#if [ -n "$$(docker ps -aq)" ]; then 
+#fi
 
 delvol:
-	if [ -n "$$(docker volume ls -qf dangling=true)" ]; then \
-		docker volume rm $$(docker volume ls -qf dangling=true); \
-	fi
+	-docker volume rm $(DOCKER_VL)
+#	if [ -n "$$(docker volume ls -qf dangling=true)" ]; then 
+#	fi
 
 re: fclean all
 
@@ -75,8 +79,8 @@ fclean: down clean delvol
 	docker system prune -a -f
 
 clean: stop
-	if [ -n "$$(docker ps -aq)" ]; then \
-		docker rm $$(docker ps -aq); \
-	fi
+	-docker rm $(DOCKER_PS)
+#	if [ -n "$$(docker ps -aq)" ]; then
+#	fi
 
 .PHONY: all fclean clean up down stop delvol env

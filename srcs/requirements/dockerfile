@@ -4,6 +4,7 @@ RUN apt-get update -y && apt-get upgrade -y
 RUN apt-get install -y \
     vim \
     git \
+    openssh-server \
     x11-common xserver-xorg \
     x11-apps \
     build-essential
@@ -12,6 +13,16 @@ COPY ./cheat.sh /home/
 
 RUN chmod +x /home/cheat.sh
 
-WORKDIR /home/
+# Config the SSH for windows PUTTY
+RUN sed -i "s/$(cat /etc/ssh/ssh_config | grep "Port ")/Port 2222/g" /etc/ssh/ssh_config
+RUN sed -i "s/$(cat /etc/ssh/ssh_config | grep "X11 ")/ForwardX11 yes/g" /etc/ssh/ssh_config
+RUN sed -i "s/$(cat /etc/ssh/sshd_config | grep "Port ")/Port 2222/g" /etc/ssh/sshd_config
+RUN sed -i "s/$(cat /etc/ssh/sshd_config | grep "X11Forwarding no")/X11Forwarding yes/g" /etc/ssh/sshd_config
 
-ENTRYPOINT ["/home/cheat.sh"]
+WORKDIR /home/
+RUN useradd -m -s /bin/bash elcube
+RUN echo "elcube:elcube123" | chpasswd
+
+EXPOSE 2222
+
+ENTRYPOINT service ssh start && tail -f
