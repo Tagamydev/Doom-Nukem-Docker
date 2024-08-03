@@ -27,7 +27,12 @@ else
 	
 endif
 
-all: build up
+all: env build up
+
+env:
+ifeq ($(COMPOSE_FILE),-linux)
+	@echo "DISPLAY=${DISPLAY}" > ./srcs/.env
+endif
 
 build:
 ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
@@ -35,7 +40,7 @@ ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 else
 	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
 	xhost +
-	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
+	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
 	docker image prune -f
 endif
 
@@ -43,15 +48,15 @@ up:
 ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
-	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
-	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml up --build
+	@echo "./srcs/docker compose$(COMPOSE_FILE).yml"
+	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml up --build
 endif
 
 down:
 ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
-	docker-compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml down
+	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml down
 endif
 
 stop:
@@ -74,4 +79,4 @@ clean: stop
 		docker rm $$(docker ps -aq); \
 	fi
 
-.PHONY: all fclean clean up down stop delvol
+.PHONY: all fclean clean up down stop delvol env
