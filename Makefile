@@ -6,7 +6,7 @@
 #    By: samusanc <samusanc@student.42madrid>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/24 19:28:25 by samusanc          #+#    #+#              #
-#    Updated: 2024/08/02 21:57:12 by samusanc         ###   ########.fr        #
+#    Updated: 2024/08/04 16:09:17 by samusanc         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,18 +41,16 @@ ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
 ifeq ($(COMPOSE_FILE),-linux)
-	@echo "./srcs/docker-compose$(COMPOSE_FILE).yml"
 	xhost +
 endif
 	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml build
-	docker image prune -f
+	-docker image prune -f
 endif
 
 up:
 ifeq ($(COMPOSE_FILE),$(INVALID_FILE))
 	@echo "Srry building not valid for this OS, try to be a normal human being..."
 else
-	@echo "./srcs/docker compose$(COMPOSE_FILE).yml"
 	docker compose -f ./srcs/docker-compose$(COMPOSE_FILE).yml up --build
 endif
 
