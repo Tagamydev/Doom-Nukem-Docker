@@ -5,6 +5,7 @@ RUN apt-get install -y \
     vim \
     git \
     openssh-server \
+    xorg libxext-dev zlib1g-dev libbsd-dev \
     x11-common xserver-xorg \
     x11-apps \
     build-essential
